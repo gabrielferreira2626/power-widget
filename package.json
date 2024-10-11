@@ -1,10 +1,10 @@
 {
-  "name": "create-power-widget",
-  "version": "1.0.3",
+  "name": "@powerdashboards/create-widget",
+  "version": "1.0.2",
   "description": "A CLI to create a power widget project",
   "type": "module",
   "bin": {
-    "create-power-widget": "./index.js"
+    "create-widget": "./index.js"
   },
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.findmore.solutions/powerdashboards/power-dashboards-widget-starter-kit.git"
+    "url": "https://github.com/gabrielferreira2626/power-widget"
   },
   "keywords": [],
   "author": "",

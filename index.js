@@ -4,10 +4,9 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import {fileURLToPath} from "url";
-import {execSync} from "child_process";
+import prettier from "prettier";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 function createDirectoryIfNotExists(directoryPath) {
  if (!fs.existsSync(directoryPath)) {
@@ -15,9 +14,26 @@ function createDirectoryIfNotExists(directoryPath) {
  }
 }
 
-function writeFileIfNotExists(filePath, content) {
+async function writeFileIfNotExists(filePath, content) {
  if (!fs.existsSync(filePath)) {
-  fs.writeFileSync(filePath, content, "utf8");
+  try {
+   let formattedContent = content;
+   if (filePath.endsWith(".json") || filePath === ".babelrc") {
+    formattedContent = await prettier.format(content, {parser: "json"});
+   } else if (filePath.endsWith(".html")) {
+    formattedContent = await prettier.format(content, {parser: "html"});
+   } else if (filePath.endsWith(".js") || filePath.endsWith(".jsx") || filePath.endsWith(".tsx")) {
+    const parser = filePath.endsWith(".tsx") || filePath.endsWith(".jsx") ? "babel-ts" : "babel";
+    formattedContent = await prettier.format(content, {parser});
+   } else if(filePath.endsWith(".css")) {
+    formattedContent = await prettier.format(content, {parser: "css"});
+   }
+
+   fs.writeFileSync(filePath, formattedContent, "utf8");
+  } catch (error) {
+   console.error(`Error formatting file ${filePath}:`, error);
+   fs.writeFileSync(filePath, content, "utf8");
+  }
  }
 }
 
@@ -35,28 +51,15 @@ async function main() {
    message: "Do you want to install Tailwind CSS?",
    default: false,
   },
-  {
-   type: "confirm",
-   name: "install_fluent_ui",
-   message: "Do you want to install Fluent UI?",
-   default: false,
-  },
-  {
-   type: "confirm",
-   name: "install_fluent_icons",
-   message: "Do you want to install Fluent UI Icons?",
-   default: false,
-  },
  ]);
 
- const {widget_name} = questions;
+ const {widget_name, install_tailwind} = questions;
 
  const projectPath = path.resolve(process.cwd(), widget_name);
  const srcPath = path.join(projectPath, "src");
  const assetsPath = path.join(srcPath, "Assets");
  const previewPath = path.join(assetsPath, "Preview");
 
- // Criar os diretórios necessários
  [projectPath, srcPath, assetsPath, previewPath].forEach(createDirectoryIfNotExists);
 
  const pascalCaseWidgetName = widget_name
@@ -116,54 +119,55 @@ async function main() {
  writeFileIfNotExists(
   path.join(projectPath, ".babelrc"),
   `{
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "useBuiltIns": "usage",
-            "corejs": 3,
-            "debug": false
-          }
-        ],
-        "@babel/preset-react",
-        "@babel/preset-typescript"
-      ],
-      "plugins": [
-        [
-          "@babel/plugin-transform-runtime",
-          {
-            "regenerator": true
-          }
-        ],
-        [
-          "@babel/plugin-proposal-class-properties",
-          {
-            "loose": true
-          }
-        ],
-        [
-          "transform-react-remove-prop-types",
-          {
-            "removeImport": true
-          }
-        ]
-      ],
-      "env": {
-        "development": {
-          "sourceMaps": true,
-          "retainLines": true
-        },
-        "test": {
-          "sourceMaps": true,
-          "retainLines": true
-        }
-      }
-    }`
+  "presets": [
+    [
+    "@babel/preset-env",
+    {
+      "useBuiltIns": "usage",
+      "corejs": 3,
+      "debug": false
+    }
+    ],
+    "@babel/preset-react",
+    "@babel/preset-typescript"
+  ],
+  "plugins": [
+    [
+    "@babel/plugin-transform-runtime",
+    {
+      "regenerator": true
+    }
+    ],
+    [
+    "@babel/plugin-proposal-class-properties",
+    {
+      "loose": true
+    }
+    ],
+    [
+    "transform-react-remove-prop-types",
+    {
+      "removeImport": true
+    }
+    ]
+  ],
+  "env": {
+    "development": {
+    "sourceMaps": true,
+    "retainLines": true
+    },
+    "test": {
+    "sourceMaps": true,
+    "retainLines": true
+    }
+  }
+  }
+  `
  );
 
  writeFileIfNotExists(
   path.join(projectPath, ".gitignore"),
-  `/dist
+  `
 /node_modules`
  );
 
@@ -277,37 +281,107 @@ async function main() {
   `.trim()
  );
 
- writeFileIfNotExists(
-  path.join(projectPath, "package.json"),
-  `{
-      "name": "${widgetNameSeparate}",
-      "version": "1.0.0",
-      "type": "module",
-      "description": "",
-      "private": true,
-      "author": "",
-      "scripts": {
-        "build": "webpack --mode production"
+ if (install_tailwind === true) {
+  writeFileIfNotExists(
+   path.join(projectPath, "package.json"),
+   `{
+        "name": "${widgetNameSeparate}",
+        "version": "1.0.0",
+        "type": "module",
+        "description": "",
+        "private": true,
+        "author": "",
+        "scripts": {
+          "build": "webpack --mode production"
+        },
+        "dependencies": {
+          "react": "^18.0.0"
+        },
+        "devDependencies": {
+          "@babel/core": "^7.0.0",
+          "tailwindcss": "^3.4.4",
+          "@babel/preset-env": "^7.0.0",
+          "@babel/preset-react": "^7.0.0",
+          "@babel/preset-typescript": "^7.0.0",
+          "babel-loader": "^8.0.0",
+          "copy-webpack-plugin": "^11.0.0",
+          "file-loader": "^6.0.0",
+          "ts-loader": "^9.0.0",
+          "typescript": "^4.0.0",
+          "webpack": "^5.0.0",
+          "webpack-cli": "^4.0.0",
+          "zip-webpack-plugin": "^5.0.0"
+        }
+      }`
+  );
+
+  writeFileIfNotExists(
+   path.join(projectPath, "postcss.config.js"),
+   `export default {
+      plugins: {
+        tailwindcss: {},
+        autoprefixer: {},
       },
-      "dependencies": {
-        "react": "^18.0.0"
-      },
-      "devDependencies": {
-        "@babel/core": "^7.0.0",
-        "@babel/preset-env": "^7.0.0",
-        "@babel/preset-react": "^7.0.0",
-        "@babel/preset-typescript": "^7.0.0",
-        "babel-loader": "^8.0.0",
-        "copy-webpack-plugin": "^11.0.0",
-        "file-loader": "^6.0.0",
-        "ts-loader": "^9.0.0",
-        "typescript": "^4.0.0",
-        "webpack": "^5.0.0",
-        "webpack-cli": "^4.0.0",
-        "zip-webpack-plugin": "^5.0.0"
-      }
     }`
- );
+  );
+
+  writeFileIfNotExists(
+   path.join(projectPath, "tailwind.config.js"),
+   `/** @type {import('tailwindcss').Config} */
+      export default {
+        content: ["./src/**/*.{ts,tsx}"],
+        theme: {
+        extend: {
+          fontFamily: {
+            primary: ["Segoe UI"],
+          },
+        },
+        },
+        plugins: [],
+      };
+    `
+  );
+
+  writeFileIfNotExists(
+   path.join(srcPath, "Index.css"),
+   `@tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+  `
+  );
+ } else {
+  writeFileIfNotExists(
+   path.join(projectPath, "package.json"),
+   `{
+        "name": "${widgetNameSeparate}",
+        "version": "1.0.0",
+        "type": "module",
+        "description": "",
+        "private": true,
+        "author": "",
+        "scripts": {
+          "build": "webpack --mode production"
+        },
+        "dependencies": {
+          "react": "^18.0.0"
+        },
+        "devDependencies": {
+          "@babel/core": "^7.0.0",
+          "@babel/preset-env": "^7.0.0",
+          "@babel/preset-react": "^7.0.0",
+          "@babel/preset-typescript": "^7.0.0",
+          "babel-loader": "^8.0.0",
+          "copy-webpack-plugin": "^11.0.0",
+          "file-loader": "^6.0.0",
+          "ts-loader": "^9.0.0",
+          "typescript": "^4.0.0",
+          "webpack": "^5.0.0",
+          "webpack-cli": "^4.0.0",
+          "zip-webpack-plugin": "^5.0.0"
+        }
+      }`
+  );
+ }
 }
 
 main().catch((error) => {
