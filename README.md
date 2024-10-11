@@ -1,1 +1,1 @@
-# power-widget
+#  @powerdashboards/widget
