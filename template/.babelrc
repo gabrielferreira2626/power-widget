@@ -1,0 +1,44 @@
+{
+ "presets": [
+  [
+   "@babel/preset-env",
+   {
+    "useBuiltIns": "usage",
+    "corejs": 3,
+    "debug": false
+   }
+  ],
+  "@babel/preset-react",
+  "@babel/preset-typescript"
+ ],
+ "plugins": [
+  [
+   "@babel/plugin-transform-runtime",
+   {
+    "regenerator": true
+   }
+  ],
+  [
+   "@babel/plugin-proposal-class-properties",
+   {
+    "loose": true
+   }
+  ],
+  [
+   "transform-react-remove-prop-types",
+   {
+    "removeImport": true
+   }
+  ]
+ ],
+ "env": {
+  "development": {
+   "sourceMaps": true,
+   "retainLines": true
+  },
+  "test": {
+   "sourceMaps": true,
+   "retainLines": true
+  }
+ }
+}

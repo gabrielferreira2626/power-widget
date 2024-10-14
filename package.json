@@ -1,6 +1,6 @@
 {
  "name": "@powerdashboards/create-widget",
- "version": "1.0.7",
+ "version": "1.0.8",
  "description": "A CLI to create a power widget project",
  "type": "module",
  "bin": {
@@ -19,6 +19,7 @@
  "author": "",
  "license": "ISC",
  "dependencies": {
+  "commander": "^12.1.0",
   "inquirer": "^12.0.0"
  },
  "devDependencies": {
