@@ -25,7 +25,7 @@ async function writeFileIfNotExists(filePath, content) {
    } else if (filePath.endsWith(".js") || filePath.endsWith(".jsx") || filePath.endsWith(".tsx")) {
     const parser = filePath.endsWith(".tsx") || filePath.endsWith(".jsx") ? "babel-ts" : "babel";
     formattedContent = await prettier.format(content, {parser});
-   } else if(filePath.endsWith(".css")) {
+   } else if (filePath.endsWith(".css")) {
     formattedContent = await prettier.format(content, {parser: "css"});
    }
 
@@ -172,6 +172,16 @@ async function main() {
  );
 
  writeFileIfNotExists(
+  path.join(projectPath, "remote-component.config.js"),
+  `
+    import React from "react";
+    export const resolve = {
+      react: React,
+    };
+  `
+ );
+
+ writeFileIfNotExists(
   path.join(projectPath, "config.js"),
   `
     const config = {
@@ -183,6 +193,46 @@ async function main() {
 
     export default config;
   `.trim()
+ );
+
+ writeFileIfNotExists(
+  path.join(projectPath, "build.config.js"),
+  `
+    import fs from "fs";
+    import path from "path";
+    import ora from "ora";
+    import chalk from "chalk";
+
+    import config from "./config.js";
+
+    const spinner = ora({
+      text: "Generating widget properties from Widget:${widgetNameSeparate}...",
+      color: 'green',
+      spinner: 'dots3',
+    }).start();
+
+    const outputFilePath = path.resolve("component.config.json");
+
+    const isProduction = process.env.NODE_ENV === "production";
+    const timestamp = new Date().toISOString();
+
+    const jsonData = {
+      ...config,
+      environment: isProduction ? "production" : "development",
+      generatedAt: timestamp,
+    };
+
+    const jsonContent = JSON.stringify(jsonData, null, 2);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      fs.writeFileSync(outputFilePath, jsonContent, "utf-8");
+      spinner.succeed(chalk.green('Widget properties generated successfully!'));
+    } catch (error) {
+      spinner.fail(chalk.red('Error generating JSON!'));
+      console.error(chalk.red(error));
+    }
+  `
  );
 
  writeFileIfNotExists(
@@ -227,6 +277,10 @@ async function main() {
             {
               from: "./src/Assets/Preview/",
               to: "preview/",
+            },
+            {
+              from: "./component.config.json",
+              to: "config/",
             },
           ],
         }),
@@ -281,6 +335,7 @@ async function main() {
   `.trim()
  );
 
+ /* "tailwindcss": "^3.4.4", */
  if (install_tailwind === true) {
   writeFileIfNotExists(
    path.join(projectPath, "package.json"),
@@ -292,25 +347,50 @@ async function main() {
         "private": true,
         "author": "",
         "scripts": {
-          "build": "webpack --mode production"
+          "build": "node build.config.js && cross-env NODE_ENV=production webpack --mode production && rimraf component.config.json"
         },
         "dependencies": {
           "react": "^18.0.0"
         },
         "devDependencies": {
-          "@babel/core": "^7.0.0",
+          "@babel/cli": "^7.25.6",
+          "@babel/core": "^7.25.2",
+          "@babel/plugin-proposal-class-properties": "^7.12.1",
+          "@babel/plugin-transform-runtime": "^7.25.4",
+          "@babel/preset-env": "^7.25.4",
+          "@babel/preset-react": "^7.24.7",
+          "@babel/preset-typescript": "^7.24.7",
+          "@babel/runtime": "^7.25.6",
+          "@paciolan/eslint-config-react": "^1.0.4",
+          "@paciolan/remote-component": "^2.13.0",
+          "@types/react": "^18.3.9",
+          "@types/react-dom": "^18.3.0",
+          "babel-eslint": "^10.1.0",
+          "babel-loader": "^9.2.1",
+          "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+          "chalk": "^5.3.0",
+          "copy-webpack-plugin": "^12.0.2",
+          "core-js": "^3.38.1",
+          "cross-env": "^7.0.3",
+          "eslint": "^9.11.1",
+          "eslint-plugin-babel": "^5.3.1",
+          "eslint-plugin-react": "^7.36.1",
+          "html-webpack-plugin": "^5.6.0",
+          "ora": "^8.1.0",
+          "react-dom": "^18.3.1",
+          "rimraf": "^6.0.1",
+          "ts-loader": "^9.5.1",
+          "typescript": "^5.6.2",
+          "webpack": "^5.94.0",
+          "webpack-assets-manifest": "^5.2.1",
+          "webpack-bundle-analyzer": "^4.10.2",
+          "webpack-cli": "^5.1.4",
+          "webpack-dashboard": "^3.3.8",
+          "webpack-dev-server": "^5.1.0",
+          "webpackbar": "^6.0.1",
+          "zip-webpack-plugin": "^4.0.1",
           "tailwindcss": "^3.4.4",
-          "@babel/preset-env": "^7.0.0",
-          "@babel/preset-react": "^7.0.0",
-          "@babel/preset-typescript": "^7.0.0",
-          "babel-loader": "^8.0.0",
-          "copy-webpack-plugin": "^11.0.0",
-          "file-loader": "^6.0.0",
-          "ts-loader": "^9.0.0",
-          "typescript": "^4.0.0",
-          "webpack": "^5.0.0",
-          "webpack-cli": "^4.0.0",
-          "zip-webpack-plugin": "^5.0.0"
+          "@types/xrm": "^9.0.81"
         }
       }`
   );
@@ -353,7 +433,7 @@ async function main() {
   writeFileIfNotExists(
    path.join(projectPath, "package.json"),
    `{
-        "name": "${widgetNameSeparate}",
+        "name": "${widgetNameSeparate.toLowerCase()}",
         "version": "1.0.0",
         "type": "module",
         "description": "",
@@ -377,7 +457,11 @@ async function main() {
           "typescript": "^4.0.0",
           "webpack": "^5.0.0",
           "webpack-cli": "^4.0.0",
-          "zip-webpack-plugin": "^5.0.0"
+          "zip-webpack-plugin": "^4.0.1",
+          "@types/react": "^18.3.11",
+          "@types/xrm": "^9.0.81",
+          "webpackbar": "^6.0.1"
+          
         }
       }`
   );

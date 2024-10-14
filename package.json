@@ -1,28 +1,28 @@
 {
-  "name": "@powerdashboards/create-widget",
-  "version": "1.0.2",
-  "description": "A CLI to create a power widget project",
-  "type": "module",
-  "bin": {
-    "create-widget": "./index.js"
-  },
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,html,css}'"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gabrielferreira2626/power-widget"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "inquirer": "^12.0.0"
-  },
-  "devDependencies": {
-    "prettier": "^3.3.3",
-    "rimraf": "^6.0.1"
-  }
+ "name": "@powerdashboards/create-widget",
+ "version": "1.0.7",
+ "description": "A CLI to create a power widget project",
+ "type": "module",
+ "bin": {
+  "create-widget": "./index.js"
+ },
+ "main": "index.js",
+ "scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,html,css}'"
+ },
+ "repository": {
+  "type": "git",
+  "url": "https://github.com/gabrielferreira2626/power-widget"
+ },
+ "keywords": [],
+ "author": "",
+ "license": "ISC",
+ "dependencies": {
+  "inquirer": "^12.0.0"
+ },
+ "devDependencies": {
+  "prettier": "^3.3.3",
+  "rimraf": "^6.0.1"
+ }
 }
