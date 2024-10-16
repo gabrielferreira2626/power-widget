@@ -5,6 +5,8 @@ import WebpackBar from "webpackbar";
 import {fileURLToPath} from "url";
 import path from "path";
 
+import config from './config.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -36,7 +38,7 @@ export default {
   main: "./src/Main.tsx",
  },
  output: {
-  filename: "widget.js",
+  filename: `${config.logicalName}.js`,
   libraryTarget: "commonjs",
   path: path.resolve(__dirname, "dist"),
  },

@@ -1,14 +1,16 @@
 {
- "compilerOptions": {
-  "target": "ES5",
-  "module": "ESNext",
-  "jsx": "react",
-  "strict": true,
-  "esModuleInterop": true,
-  "skipLibCheck": true,
-  "forceConsistentCasingInFileNames": true,
-  "moduleResolution": "Node"
- },
- "include": ["src/**/*"],
- "exclude": ["node_modules"]
-}
+  "compilerOptions": {
+   "target": "ES5",
+   "resolveJsonModule": true,
+   "module": "ESNext",
+   "jsx": "react",
+   "strict": true,
+   "esModuleInterop": true,
+   "skipLibCheck": true,
+   "forceConsistentCasingInFileNames": true,
+   "moduleResolution": "Node"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+ }
+ 

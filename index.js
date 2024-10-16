@@ -6,7 +6,7 @@ import {fileURLToPath} from "url";
 
 import {getQuestions} from "./questions.js";
 import {copyTemplate} from "./copyTemplate.js";
-import {modifyPackageJson} from "./changeFiles.js";
+import {modifyConfigFile, modifyPackageJson} from "./changeFiles.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +21,8 @@ async function main() {
  const templateDir = path.join(__dirname, "template");
 
  copyTemplate(templateDir, targetDirectory);
+
+ modifyConfigFile(targetDirectory, widgetName);
 
  modifyPackageJson(targetDirectory, widgetName, widgetDescription, widgetAuthor);
 }

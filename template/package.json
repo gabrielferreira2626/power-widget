@@ -6,13 +6,16 @@
  "private": true,
  "author": "",
  "scripts": {
-  "build": "node build.config.js && cross-env NODE_ENV=production webpack --mode production && rimraf component.config.json"
+  "build": "node build.config.js && cross-env NODE_ENV=production webpack --mode production && rimraf component.config.json",
+  "generate:types": "json2ts -i src/properties-schema.json -o src/Interfaces/InputProperties.ts"
  },
  "dependencies": {
   "react": "^18.0.0",
   "tailwindcss": "^3.4.4"
  },
  "devDependencies": {
+  "ajv": "^8.17.1",
+  "json-schema-to-typescript": "^15.0.2",
   "@babel/cli": "^7.25.6",
   "@babel/core": "^7.25.2",
   "@babel/plugin-proposal-class-properties": "^7.12.1",

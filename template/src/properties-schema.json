@@ -1,0 +1,14 @@
+{
+ "title": "InputWidgetProperties",
+ "type": "object",
+ "properties": {
+  "title": {
+   "type": "string",
+   "description": "",
+   "logicalName": "title",
+   "displayName": "Title"
+  }
+ },
+ "additionalProperties": false,
+ "required": ["title"]
+}

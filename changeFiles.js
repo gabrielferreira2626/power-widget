@@ -20,4 +20,17 @@ const modifyPackageJson = (targetDirectory, projectName, projectDescription, pro
  }
 };
 
-export {modifyPackageJson};
+const modifyConfigFile = (targetDirectory, projectName) => {
+ const configFilePath = path.join(targetDirectory, "config.js");
+
+ if (fs.existsSync(configFilePath)) {
+  let configJsContent = fs.readFileSync(configFilePath, "utf-8");
+
+  configJsContent = configJsContent.replace(/logicalName: ""/, `logicalName: "${projectName.toLowerCase()}"`);
+  configJsContent = configJsContent.replace(/displayName: ""/, `displayName: "${projectName}"`);
+
+  fs.writeFileSync(configFilePath, configJsContent);
+ }
+};
+
+export {modifyPackageJson, modifyConfigFile};
