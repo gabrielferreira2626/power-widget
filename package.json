@@ -1,6 +1,6 @@
 {
- "name": "@powerdashboards/create-widget",
- "version": "1.1.2",
+ "name": "create-power-widget",
+ "version": "1.1.4",
  "description": "A CLI to create a power widget project",
  "type": "module",
  "bin": {
